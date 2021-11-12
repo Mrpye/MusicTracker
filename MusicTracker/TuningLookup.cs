@@ -11,40 +11,48 @@ namespace MusicTracker
         public IDictionary<string, double> Note_Lookup { get; set; } = new Dictionary<string, double>();
         public TuningLookup()
         {
-            Note_Lookup.Add("C",16.35);
-            Note_Lookup.Add("C#", 17.32);
-            Note_Lookup.Add("Db", 17.32);
-            Note_Lookup.Add("D",18.35);
-            Note_Lookup.Add("D#", 19.45);
-            Note_Lookup.Add("Eb", 19.45);
-            Note_Lookup.Add("E", 20.06);
-            Note_Lookup.Add("F",21.83);
-            Note_Lookup.Add("F#", 23.12);
-            Note_Lookup.Add("Gb", 23.12);
-            Note_Lookup.Add("G", 24.5);
-            Note_Lookup.Add("G#", 25.96);
-            Note_Lookup.Add("Ab", 25.96);
-            Note_Lookup.Add("A", 27.5);
-            Note_Lookup.Add("A#", 29.14);
-            Note_Lookup.Add("Bb", 29.14);
-            Note_Lookup.Add("B", 30.87);
+            double step = 0.5 / 16;
+            Note_Lookup.Add("C", 0.5);
+            Note_Lookup.Add("C#", 0.5 + (step*1));
+            Note_Lookup.Add("Db", 0.5 + (step * 2));
+            Note_Lookup.Add("D", 0.51 + (step * 3));
+            Note_Lookup.Add("D#", 0.5 + (step * 4));
+            Note_Lookup.Add("Eb", 0.5 + (step * 5));
+            Note_Lookup.Add("E", 0.5 + (step * 6));
+            Note_Lookup.Add("F", 0.5 + (step * 7));
+            Note_Lookup.Add("F#", 0.51 + (step * 8));
+            Note_Lookup.Add("Gb", 0.51 + (step * 9));
+            Note_Lookup.Add("G", 0.5 + (step * 10));
+            Note_Lookup.Add("G#", 0.5 + (step * 11));
+            Note_Lookup.Add("Ab", 0.5 + (step * 12));
+            Note_Lookup.Add("A", 0.5 + (step * 13));
+            Note_Lookup.Add("A#", 0.5 + (step * 14));
+            Note_Lookup.Add("Bb", 0.5 + (step * 15));
+            Note_Lookup.Add("B", 0.5 + (step * 16));
+    
 
         }
         public double GetFeq(string note)
         {
-            if (note.Length == 2) {
+            if (note.Trim().Length == 2) {
                 double feq = Note_Lookup[note.Substring(0, 1)];
                 int oct = int.Parse(note.Substring(1, 1));
-                double res= Math.Pow(feq, (oct + 1));
+                double res = feq + oct;// Math.Pow(feq, (oct + 1));
                 return res;
-            } else if (note.Length == 3) {
+            } else if (note.Trim().Length == 3) {
                 double feq = Note_Lookup[note.Substring(0, 2)];
                 int oct = int.Parse(note.Substring(2, 1));
-                double res = Math.Pow(feq, (oct + 1));
+                double res = feq + oct;
                 return res;
             } else {
-                return 0;
+                if (note == "-") {
+                    return -1;
+                } else {
+                    return 0;
+                }
+               
             }
         }
     }
+
 }

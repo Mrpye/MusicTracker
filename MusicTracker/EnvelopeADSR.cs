@@ -10,6 +10,13 @@ namespace MusicTracker
         private const int OSC_SAW_ANA = 3;
         private const int OSC_SAW_DIG = 4;
         private const int OSC_NOISE = 5;
+        private const int INSTRA_DRUM = 6;
+        private const int INSTRA_SNARE = 7;
+        private const int INSTRA_HIHAT = 8;
+        private const int INSTRA_HARMONICA = 9;
+        
+
+        private const int RAND_MAX = 0x7fff;
 
         #region Fields
 
@@ -31,6 +38,7 @@ namespace MusicTracker
 
         private double dOctaveBaseFrequency = 32.70; // A2		// frequency of octave represented by keyboard
         private double d12thRootOf2 = Math.Pow(2.0, 1.0 / 12.0);        // assuming western 12 notes per ocatve
+        private System.Random rnd = new System.Random();
 
         public EnvelopeADSR()
         {
@@ -42,6 +50,15 @@ namespace MusicTracker
             this.isNoteON = false;
             this.TriggerOffTime = 0.0;
             this.TriggerOnTime = 0.0;
+            Set_Dum();
+        }
+
+        public void Set_Dum()
+        {
+            this.AttackTime = 0.01;
+            this.DecayTime = 0.15;
+            this.SustainAmplitude = 0.0;
+            this.ReleaseTime = 0.0;
         }
 
         // Call when key is pressed
@@ -63,15 +80,60 @@ namespace MusicTracker
         public double PlayNote(float globalTime, double feq, int sound)
         {
             //This handles the note
-           // double dFrequencyOutput = dOctaveBaseFrequency * Math.Pow(d12thRootOf2, note);
+            // double dFrequencyOutput = dOctaveBaseFrequency * Math.Pow(d12thRootOf2, note);
             double dFrequencyOutput = dOctaveBaseFrequency * Math.Pow(d12thRootOf2, 1);
 
-            double dOutput = this.GetAmplitude(globalTime) * 1.0 * osc(feq * 0.5, globalTime, sound);
-            /*     (
-                     +
-                     + 1.0 * osc(dFrequencyOutput * 0.5, globalTime, OSC_SAW_DIG)
-                 );*/
-            return dOutput;
+            switch (sound) {
+                case INSTRA_DRUM: // Sine wave bewteen -1 and +1
+                    this.AttackTime = 0.01;
+                    this.DecayTime = 0.15;
+                    this.SustainAmplitude = 0.0;
+                    this.ReleaseTime = 0.0;
+                    return this.GetAmplitude(globalTime) * (
+                        0.99 * osc(feq * 0.5, globalTime, OSC_SINE)
+                        +0.009 * osc(feq * 0.5, globalTime, OSC_NOISE)
+                    );
+                case INSTRA_SNARE: // Sine wave bewteen -1 and +1
+                    this.AttackTime = 0.00;
+                    this.DecayTime = 0.2;
+                    this.SustainAmplitude = 0.0;
+                    this.ReleaseTime = 0.0;
+
+                    return this.GetAmplitude(globalTime) * (
+                        0.5 * osc(feq * 0.5, globalTime, OSC_SINE)
+                        + 0.5 * osc(feq * 0.5, globalTime, OSC_NOISE)
+                    );
+                case INSTRA_HIHAT: // Sine wave bewteen -1 and +1
+                    this.AttackTime = 0.01;
+                    this.DecayTime = 0.05;
+                    this.SustainAmplitude = 0.0;
+                    this.ReleaseTime = 0.0;
+
+                    return this.GetAmplitude(globalTime) * (
+                        0.1 * osc(feq * 0.5, globalTime, OSC_SQUARE)
+                        + 0.9 * osc(feq * 0.5, globalTime, OSC_NOISE)
+                    );
+
+                case INSTRA_HARMONICA: // Sine wave bewteen -1 and +1
+                    this.AttackTime = 0.00;
+                    this.DecayTime = 1.0;
+                    this.SustainAmplitude = 0.95;
+                    this.ReleaseTime = 0.1;
+
+                   
+                    return this.GetAmplitude(globalTime) * (
+                        0.25 * osc(feq * 0.5, globalTime, OSC_SAW_ANA)
+                        + 0.25 * osc(feq * 0.5, globalTime, OSC_SQUARE)
+          
+                    );
+
+
+                default:
+                    double dOutput = this.GetAmplitude(globalTime) *(1.0 * osc(feq * 0.5, globalTime, sound));
+                    return dOutput;
+            }
+
+            
         }
 
         internal double w(double dHertz)
@@ -103,9 +165,12 @@ namespace MusicTracker
                 case OSC_SAW_DIG: // Saw Wave (optimised / harsh / fast)
                     return (2.0 / Math.PI) * (dHertz * Math.PI * Math.IEEERemainder(dTime, 1.0 / dHertz) - (Math.PI / 2.0));
 
-                //   case OSC_NOISE: // Pseudorandom noise
-                //         return 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
+                case OSC_NOISE: // Pseudorandom noise
 
+                    return 2.0 * ((double)rnd.NextDouble()) - 1.0;
+
+              
+                    
                 default:
                     return 0.0;
             }
@@ -138,8 +203,11 @@ namespace MusicTracker
             }
 
             // Amplitude should not be negative
-            if (dAmplitude <= 0.0001)
+            if (dAmplitude <= 0.0001) {
                 dAmplitude = 0.0;
+                //this.isNoteON = false;
+            }
+               
 
             return dAmplitude;
         }

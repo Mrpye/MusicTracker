@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -236,7 +237,7 @@ namespace PixelEngine
 		public void CreateAudio(uint sampleRate = 44100, uint channels = 1, uint blocks = 4, uint blockSamples = 512)
 		{
             try {
-
+                //44100
                 Active = false;
                 this.sampleRate = sampleRate;
                 this.channels = channels;
@@ -275,8 +276,14 @@ namespace PixelEngine
                 }
 
                 Active = true;
-                audioThread = new Thread(AudioThread);
-                audioThread.Start();
+                try {
+                    audioThread = new Thread(AudioThread);
+                    audioThread.Start();
+                }catch(Exception ex) {
+                    Debug.Print(ex.Message);
+                }
+               
+
             }catch(Exception ex) {
                 System.Diagnostics.Debug.Print(ex.Message);
             }
@@ -348,12 +355,17 @@ namespace PixelEngine
 			float timeStep = 1.0f / sampleRate;
 
 			float maxSample = (float)(Math.Pow(2, (sizeof(short) * 8) - 1) - 1);
+          
 
 			while (Active)
 			{
-				if (blockFree == 0)
-					while (blockFree == 0)
-						Thread.Sleep(SoundInterval);
+                int count = 0;
+
+                if (blockFree == 0)
+					while (blockFree == 0) {
+                        Thread.Sleep(SoundInterval);
+                    }
+						
 
 				blockFree--;
 
