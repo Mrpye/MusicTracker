@@ -1,20 +1,16 @@
 # MusicTracker
 This project is a simple music tracker written in c++. In my youth i owned a Amiga 1200 and love writing tunes using music trackers it was my first venture into writing music. So i thought i would have a play and see if i could write a basic music tracker.
 
+It's not very sophisticated or elegant but it was only ever going to be an experiment but your welcome to have a play.
+
 # How it work 
 It quite simple just by playing back the samples at diffrent rates produces diffrent pitches
 - It has 8 channels
 - set the note
 - set volume
 
-
-new_song_group.track6.note = note_data[0].Trim();
-                            new_song_group.track6.feq = tuning.GetFeq(note_data[0].Trim());
-                            new_song_group.track6.volume = double.Parse(note_data[1].Trim());
-                            new_song_group.track6.sound = int.Parse(note_data[2].Trim());
-
 # Create a song
-you create a file that 
+you create a text file that 
 - sets the temo 
 - number of channes
 - list the sample (have a folder with same name as file)
@@ -36,6 +32,10 @@ in this example we have 3 channels  **C1:1:0,C1:0.5:2,C0:1:4** this breaks down 
   - sound=0 (crash.wav)
 
 If you dont want the nmote to play set the note to **-**
+
+
+# Example 
+this example is under MusicTracker/Music/
 
 ```
 TEMPO 200
@@ -66,7 +66,12 @@ C1:1:1,C1:0.5:2,-:1:4
 - :1:0,C1:0.5:3,-:1:4
 BLOCK_END
 ```
+# How to play
+You will need to change the path to the song file
 
+MusicTracker/Program.cs
+
+this.mm.LoadSong(@"D:\Projects\Net\MusicTracker\Music\song.txt");
 
 # IDE
 Visual studio 2019
